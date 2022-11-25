@@ -1,21 +1,21 @@
 import React from 'react';
 import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
-import { useQuery } from 'react-query';
-// API Calls
-import { fetchNearbyPlaces, fetchWeather } from './api';
-// Map Settings
-import { containerStyle, center, options } from './settings';
+import { useQuery } from 'react-query'
 // Components
 import CurrentLocation from './components/CurrentLocation';
-// Image
-import beerIcon from './images/beer.svg';
+//API Calls
+import { fetchNearbyPlaces , fetchWeather} from './api';
+//Map Settings
+import { containerStyle, center, options } from './settings';
+//Image
+import beerIcon from './images/beer.svg'
 // Styles
 import { Wrapper, LoadingView } from './App.styles';
 
 export type WeatherType = {
   temp: number;
   text: string;
-};
+}
 
 export type MarkerType = {
   id: string;
@@ -46,15 +46,15 @@ const App: React.FC = () => {
     refetchOnWindowFocus: false
   });
 
-  const {
+  const{
     data: markerWeather,
     isLoading: isLoadingMarkerWeather,
-    isError: isErrorMarkerWeather
+    isError: isErrorMarkerWeather,
   } = useQuery([selectedMarker.id], () => fetchWeather(selectedMarker), {
     enabled: !!selectedMarker.id,
     refetchOnWindowFocus: false,
     staleTime: 60 * 1000 * 5 // 5 minutes
-  });
+  })
 
   const moveTo = (position: google.maps.LatLngLiteral) => {
     if (mapRef.current) {
@@ -75,11 +75,12 @@ const App: React.FC = () => {
   const onMapClick = (e: google.maps.MapMouseEvent) => {
     setClickedPos({ lat: e.latLng.lat(), lng: e.latLng.lng() });
     setSelectedMarker({} as MarkerType);
+
   };
 
   const onMarkerClick = (marker: MarkerType) => setSelectedMarker(marker);
 
-  if (!isLoaded) return <div>Map Loading ...</div>;
+  if (!isLoaded) return <div> Map Loading ...</div>
 
   return (
     <Wrapper>
@@ -103,26 +104,30 @@ const App: React.FC = () => {
               url: beerIcon,
               origin: new window.google.maps.Point(0, 0),
               anchor: new window.google.maps.Point(15, 15),
-              scaledSize: new window.google.maps.Size(30, 30)
+              scaledSize: new window.google.maps.Size(50, 30)
             }}
           />
         ))}
+
         {selectedMarker.location && (
-          <InfoWindow position={selectedMarker.location} onCloseClick={() => setSelectedMarker({} as MarkerType)}>
-            <div>
-              <h3>{selectedMarker.name}</h3>
-              {isLoadingMarkerWeather ? (
-                <p>Loading Weather ...</p>
-              ) : (
-                <>
-                  <p>{markerWeather?.text}</p>
-                  <p>{markerWeather?.temp} &#xb0;C</p>
-                </>
-              )}
-            </div>
-          </InfoWindow>
+          <InfoWindow
+            position={selectedMarker.location}
+            onCloseClick={() => setSelectedMarker({} as MarkerType)}
+            >
+              <div>
+                <h3>{selectedMarker.name}</h3>
+                {isLoadingMarkerWeather ? (
+                  <p> Loading Weather ...</p>
+                ) : (
+                  <>
+                    <p>{markerWeather?.text}</p>
+                    <p>{markerWeather?.temp} &#xb0;F</p>
+                  </>
+                )}
+              </div>
+            </InfoWindow>
         )}
-      </GoogleMap>
+        </GoogleMap>
     </Wrapper>
   );
 };
